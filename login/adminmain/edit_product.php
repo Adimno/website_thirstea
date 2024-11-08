@@ -1,4 +1,9 @@
 <?php
+
+require '../../vendor/autoload.php'; // Include Cloudinary SDK
+
+use Cloudinary\Cloudinary;
+use \Cloudinary\Uploader;
 // Database connection
 $con = mysqli_connect('localhost', 'root', '', 'thirstea');
 
@@ -6,6 +11,15 @@ $con = mysqli_connect('localhost', 'root', '', 'thirstea');
 if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
+
+// Initialize Cloudinary
+$cloudinary = new Cloudinary([ 
+    'cloud' => [
+        'cloud_name' => 'dxhoqm4st', 
+        'api_key' => '643428899293169', 
+        'api_secret' => '5OLnAOFkZBA26O8A5MtAeRlW_Vc',
+    ]
+]);
 
 // Check if the product ID is passed in the URL
 if (isset($_GET['id'])) {
@@ -52,7 +66,6 @@ if (isset($_POST['edit_product'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,10 +101,10 @@ if (isset($_POST['edit_product'])) {
                                    <label for="category">Category</label>
                                        <select id="category" name="category" class="form-control" required>
                                           <option value="">Select Category</option>
-                                        <option value="Milktea">Milktea</option>
-                                       <option value="Fruitea">Fruitea</option>
-                                       <option value="Frappe">Frappe</option>
-                                    </select>
+                                          <option value="Milktea" <?= $product['category'] == 'Milktea' ? 'selected' : '' ?>>Milktea</option>
+                                          <option value="Fruitea" <?= $product['category'] == 'Fruitea' ? 'selected' : '' ?>>Fruitea</option>
+                                          <option value="Frappe" <?= $product['category'] == 'Frappe' ? 'selected' : '' ?>>Frappe</option>
+                                       </select>
                                   </div>
                             <!-- Product Description -->
                             <div class="form-group">
