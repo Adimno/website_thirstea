@@ -6,65 +6,72 @@ $specialArray = $_SESSION['Specials'] ?? [];
 
 $sqlLink = mysqli_connect('localhost', 'root', '', 'thirstea');
 
-// Helper function for calculating order amount based on size
-function calculateOrderAmount($quantity, $basePrice, $size) {
+// If email is not found in session, it means the user is not logged in
+if (!$email) {
+    echo '<script>alert("Please log in to add items to the cart."); window.location.href="login.php";</script>';
+    exit();
+}
+
+// If email is not found in session, it means the user is not logged in
+if (!$email) {
+    echo '<script>alert("Please log in to add items to the cart."); window.location.href="login.php";</script>';
+    exit();
+}
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
+    // Get the product details from the form
+    $productId = (int)$_POST['product_id'];
+    $imageUrl = $_POST['imageUrl'];  // Retrieve Image URL
+    $size = $_POST['size'];
+    $quantity = (int)$_POST['order_quantity'];
+    $description = $_POST['description'];  // Retrieve Description
+
+    // Fetch product information from the database
+    $sql = "SELECT product_name, price FROM product WHERE product_id = ?";
+    $stmt = $sqlLink->prepare($sql);
+    $stmt->bind_param("i", $productId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+
+    if ($product) {
+        $productName = $product['product_name'];
+        $price = $product['price'];
+
+        // Calculate order amount based on size (extra charges for size)
+        $orderAmount = calculateOrderAmount($quantity, $price, $size);
+
+        // Insert the product into the user_cart table, linked by email
+        $insertSql = "INSERT INTO user_cart (product_name, user_email, product_id, imageUrl, description, size, order_quantity, order_amount) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $insertStmt = $sqlLink->prepare($insertSql);
+        $insertStmt->bind_param("ssisssid", $productName, $email, $productId, $imageUrl, $description, $size, $quantity, $orderAmount);
+
+        if ($insertStmt->execute()) {
+            echo '<script>alert("Item added to the cart."); window.location.href="cart/cart.php";</script>';
+        } else {
+            echo '<script>alert("Error adding item to cart.");</script>';
+        }
+    } else {
+        echo '<script>alert("Product not found.");</script>';
+    }
+}
+
+
+function calculateOrderAmount($quantity, $price, $size) {
+    $extraCharge = 0;
     switch ($size) {
         case 'MEDIUM':
-            return $quantity * $basePrice + 20;
+            $extraCharge = 10; // Extra charge for medium size
+            break;
         case 'LARGE':
-            return $quantity * $basePrice + 50;
-        default:
-            return $quantity * $basePrice;
+            $extraCharge = 20; // Extra charge for large size
+            break;
     }
+    return ($price + $extraCharge) * $quantity;
 }
 
-// Process special cart items
-if (isset($_POST['SpecialCart'])) {
-    foreach ($specialArray as $productInfo) {
-        $productName = $productInfo['productName'];
-        $price = $productInfo['price'];
-        $quantity = $_POST[$productName . 'QTY'];
-        $size = $_POST['size'];
 
-        $orderAmount = calculateOrderAmount($quantity, $price, $size);
-        $_SESSION['orderamount'][] = $orderAmount;
-        $_SESSION['orderqty'][] = $quantity;
-        $_SESSION['orderitems'][] = "{$productName} {$size}";
 
-        echo '<script>alert("Item added to the cart.");</script>';
-    }
-    $_SESSION['Specials'] = [];
-}
-
-// Define products for individual item adds
-$products = [
-    'atcSalted' => ['name' => 'Salted Caramel Tea', 'quantity' => $_POST['quantSalted'] ?? 0],
-    'atcmatcha' => ['name' => 'Matcha Latte Milk Tea', 'quantity' => $_POST['quantMatcha'] ?? 0],
-    'atcvanilla' => ['name' => 'Vanilla Sweet Milk Tea', 'quantity' => $_POST['quantVanilla'] ?? 0],
-    'atclemon' => ['name' => 'Lemon Iced Tea', 'quantity' => $_POST['quantLemon'] ?? 0],
-    'atcorange' => ['name' => 'Orange Iced Tea', 'quantity' => $_POST['quantOrange'] ?? 0],
-    'atcpineapple' => ['name' => 'Pineapple Iced Tea', 'quantity' => $_POST['quantPineapple'] ?? 0],
-    'atciced' => ['name' => 'Iced Chickolet Frappe', 'quantity' => $_POST['quantIced'] ?? 0],
-    'atcjava' => ['name' => 'JavaChipsie Frappe', 'quantity' => $_POST['quantJava'] ?? 0],
-    'atctriple' => ['name' => 'Triple Mocha Frappe', 'quantity' => $_POST['quantTriple'] ?? 0],
-];
-
-// Process individual item add-to-cart actions
-foreach ($products as $postKey => $product) {
-    if (isset($_POST[$postKey])) {
-        $quantity = $product['quantity'];
-        $size = $_POST['size'];
-        $price = $_SESSION[$product['name']] ?? 0;
-
-        if ($price) {
-            $orderAmount = calculateOrderAmount($quantity, $price, $size);
-            $_SESSION['orderamount'][] = $orderAmount;
-            $_SESSION['orderqty'][] = $quantity;
-            $_SESSION['orderitems'][] = "{$product['name']} {$size}"; // Add product and size
-            echo '<script>alert("Item added to the cart.");</script>';
-        }
-    }
-}
 
 // Checkout process
 if (isset($_POST['checkout'])) {
@@ -109,9 +116,34 @@ if (isset($_POST['checkout'])) {
 
 // Clear cart
 if (isset($_POST['clrcart'])) {
+    // Clear session data for the cart
     $_SESSION['orderqty'] = [];
     $_SESSION['orderamount'] = [];
     $_SESSION['orderitems'] = [];
+
+    // Get the user's email from the session
+    $userEmail = $_SESSION['email'];
+
+    // Prepare the SQL query to delete the cart items from the database
+    $deleteQuery = "DELETE FROM user_cart WHERE user_email = ?";
+
+    // Prepare and bind parameters to avoid SQL injection
+    if ($stmt = $sqlLink->prepare($deleteQuery)) {
+        $stmt->bind_param("s", $userEmail);
+
+        // Execute the query and check if it was successful
+        if ($stmt->execute()) {
+            echo '<script>alert("Cart cleared successfully.");</script>';
+        } else {
+            echo '<script>alert("Error clearing the cart in the database.");</script>';
+        }
+        $stmt->close();
+    } else {
+        echo '<script>alert("Error preparing the delete query.");</script>';
+    }
+
+    // Redirect to the cart page after clearing the cart
     header("Location: cart.php");
+    exit();
 }
 ?>
