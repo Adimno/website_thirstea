@@ -85,7 +85,7 @@ if (isset($_POST['checkout'])) {
         $stmt = $sqlLink->prepare($query);
 
         // Ensure parameters are passed correctly with the correct types
-        $stmt->bind_param("ssds", $email, $productName, $quantity, $orderAmount, $selectedPaymentMethod);
+        $stmt->bind_param("ssdss", $email, $productName, $quantity, $orderAmount, $selectedPaymentMethod);
 
         // Check if the query executed successfully
         if (!$stmt->execute()) {
