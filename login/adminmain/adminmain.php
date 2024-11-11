@@ -135,10 +135,10 @@
                 <?php
                 $counter = 0;
                 
-                $query1 = $sqlLink->query("SELECT * FROM product ORDER by id");
+                $query1 = $sqlLink->query("SELECT * FROM product ORDER by product_id");
                 while ($row1 = $query1->fetch_array()) {
                     echo "<tr>";
-                    echo "<td>" . $row1['id'] . "</td>";
+                    echo "<td>" . $row1['product_id'] . "</td>";
                     echo "<td><img src='" . $row1['imageUrl'] . "' width='50' height='50'></td>";
                     echo "<td>" . $row1['product_name'] . "</td>";
                     echo "<td>" . $row1['category'] . "</td>";
@@ -152,10 +152,10 @@
                   }
                     
                     // Edit button (will navigate to a new page or open a modal for editing)
-                    echo "<td><a href='edit_product.php?id=" . $row1['id'] . "' class='btn btn-warning'>Edit</a></td>";
+                    echo "<td><a href='edit_product.php?id=" . $row1['product_id'] . "' class='btn btn-warning'>Edit</a></td>";
                     
                     // Delete button
-                    echo "<td><a href='?delete_id=" . $row1['id'] . "' class='btn btn-danger'>Delete</a></td>";
+                    echo "<td><a href='?delete_id=" . $row1['product_id'] . "' class='btn btn-danger'>Delete</a></td>";
                     
                     echo "</tr><br>";
                     $counter++;

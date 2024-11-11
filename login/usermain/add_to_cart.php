@@ -1,393 +1,117 @@
 <?php
+session_start();
 
+$email = $_SESSION['email'];
+$specialArray = $_SESSION['Specials'] ?? [];
 
-$email=$_SESSION['email'];
+$sqlLink = mysqli_connect('localhost', 'root', '', 'thirstea');
 
-$SpecialArray= $_SESSION['Specials'];
+// Helper function for calculating order amount based on size
+function calculateOrderAmount($quantity, $basePrice, $size) {
+    switch ($size) {
+        case 'MEDIUM':
+            return $quantity * $basePrice + 20;
+        case 'LARGE':
+            return $quantity * $basePrice + 50;
+        default:
+            return $quantity * $basePrice;
+    }
+}
 
- 
+// Process special cart items
+if (isset($_POST['SpecialCart'])) {
+    foreach ($specialArray as $productInfo) {
+        $productName = $productInfo['productName'];
+        $price = $productInfo['price'];
+        $quantity = $_POST[$productName . 'QTY'];
+        $size = $_POST['size'];
 
-
-
-
- 
- $sqlLink = mysqli_connect('localhost', 'root','' , 'thirstea');
- 
- 
- 
- if (isset($_POST['SpecialCart'])) {
-    foreach ($_SESSION['Specials'] as $productInfo) {
-        $productNameKey = 'productName';
-        $priceKey = 'price';
-		$_SESSION[$productInfo[$productNameKey]]=$productInfo[$priceKey];
-
-      
-$quantSpec = $_POST[$productInfo[$productNameKey] . 'QTY'];
-
-        if ($_POST['size'] == 'REGULAR') {
-            $oramSpec = $quantSpec * $productInfo[$priceKey];
-            array_push($_SESSION['orderamount'], $oramSpec);
-        } elseif ($_POST['size'] == 'MEDIUM') {
-            $oramSpec = $quantSpec * $productInfo[$priceKey] + 20;
-            array_push($_SESSION['orderamount'], $oramSpec);
-        } elseif ($_POST['size'] == 'LARGE') {
-            $oramSpec = $quantSpec * $productInfo[$priceKey] + 50;
-            array_push($_SESSION['orderamount'], $oramSpec);
-        }
-
-        array_push($_SESSION['orderqty'], $quantSpec);
-
-        array_push($_SESSION['orderitems'], "{$productInfo[$productNameKey]} {$_POST['size']}");
+        $orderAmount = calculateOrderAmount($quantity, $price, $size);
+        $_SESSION['orderamount'][] = $orderAmount;
+        $_SESSION['orderqty'][] = $quantity;
+        $_SESSION['orderitems'][] = "{$productName} {$size}";
 
         echo '<script>alert("Item added to the cart.");</script>';
-		$_SESSION['Specials'] = [];
+    }
+    $_SESSION['Specials'] = [];
+}
+
+// Define products for individual item adds
+$products = [
+    'atcSalted' => ['name' => 'Salted Caramel Tea', 'quantity' => $_POST['quantSalted'] ?? 0],
+    'atcmatcha' => ['name' => 'Matcha Latte Milk Tea', 'quantity' => $_POST['quantMatcha'] ?? 0],
+    'atcvanilla' => ['name' => 'Vanilla Sweet Milk Tea', 'quantity' => $_POST['quantVanilla'] ?? 0],
+    'atclemon' => ['name' => 'Lemon Iced Tea', 'quantity' => $_POST['quantLemon'] ?? 0],
+    'atcorange' => ['name' => 'Orange Iced Tea', 'quantity' => $_POST['quantOrange'] ?? 0],
+    'atcpineapple' => ['name' => 'Pineapple Iced Tea', 'quantity' => $_POST['quantPineapple'] ?? 0],
+    'atciced' => ['name' => 'Iced Chickolet Frappe', 'quantity' => $_POST['quantIced'] ?? 0],
+    'atcjava' => ['name' => 'JavaChipsie Frappe', 'quantity' => $_POST['quantJava'] ?? 0],
+    'atctriple' => ['name' => 'Triple Mocha Frappe', 'quantity' => $_POST['quantTriple'] ?? 0],
+];
+
+// Process individual item add-to-cart actions
+foreach ($products as $postKey => $product) {
+    if (isset($_POST[$postKey])) {
+        $quantity = $product['quantity'];
+        $size = $_POST['size'];
+        $price = $_SESSION[$product['name']] ?? 0;
+
+        if ($price) {
+            $orderAmount = calculateOrderAmount($quantity, $price, $size);
+            $_SESSION['orderamount'][] = $orderAmount;
+            $_SESSION['orderqty'][] = $quantity;
+            $_SESSION['orderitems'][] = "{$product['name']} {$size}"; // Add product and size
+            echo '<script>alert("Item added to the cart.");</script>';
+        }
     }
 }
 
+// Checkout process
+if (isset($_POST['checkout'])) {
+    $totalAmount = array_sum($_SESSION['orderamount'] ?? []);
+    
+    // Get the selected payment method
+    $selectedPaymentMethod = $_POST['payment_method'] ?? 'COD';  // Default to 'COD' if nothing is selected
 
+    // Insert each order item separately
+    foreach ($_SESSION['orderitems'] as $index => $item) {
+        $productName = $item; // Product name with size
+        $quantity = $_SESSION['orderqty'][$index]; // Quantity
+        $orderAmount = $_SESSION['orderamount'][$index]; // Total amount for the product
 
- 
- 
- 
- 
- 
-if (isset($_POST['atcSalted'])){
-	$quantSalted=$_POST['quantSalted'];
-	
-	
-	if ($_POST['size'] == 'REGULAR') {
-        $oram=$quantSalted*$_SESSION['Salted Caramel Tea'];
-		
-	array_push($_SESSION['orderamount'], $oram);
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		$oram=($quantSalted*$_SESSION['Salted Caramel Tea'])+20;
-		
-		
-	array_push($_SESSION['orderamount'], $oram);
-        
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oram=($quantSalted*$_SESSION['Salted Caramel Tea'])+50;
-		
-	array_push($_SESSION['orderamount'], $oram);
-        
-    }
-	
-	
-	array_push($_SESSION['orderqty'], $quantSalted);
+        // Insert the order item into the database
+        $query = "INSERT INTO orders (user_email, order_items, order_quantity, order_amount, payment_method) 
+                  VALUES (?, ?, ?, ?, ?)";
+        $stmt = $sqlLink->prepare($query);
 
-	array_push($_SESSION['orderitems'], "Salted Caramel Tea {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-  if (isset($_POST['atcmatcha'])){
-	  $quantMatcha=$_POST['quantMatcha'];
-	  
-	  if ($_POST['size'] == 'REGULAR') {
-		  $oram1=$quantMatcha*$_SESSION['Matcha Latte Milk Tea'];
-        array_push($_SESSION['orderamount'], $oram1);
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		$oram1=($quantMatcha*$_SESSION['Matcha Latte Milk Tea'])+20;
-        array_push($_SESSION['orderamount'], $oram1);
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oram1=($quantMatcha*$_SESSION['Matcha Latte Milk Tea'])+50;
-        array_push($_SESSION['orderamount'], $oram1);
-    }
-	  
-	  
-	
-	array_push($_SESSION['orderqty'], $quantMatcha);
-	
+        // Ensure parameters are passed correctly with the correct types
+        $stmt->bind_param("ssds", $email, $productName, $quantity, $orderAmount, $selectedPaymentMethod);
 
-	array_push($_SESSION['orderitems'], "Matcha Latte Milk Tea {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-   if (isset($_POST['atcvanilla'])){
-	   $quantVanilla=$_POST['quantVanilla'];
-	   
-	   if ($_POST['size'] == 'REGULAR') {
-		   $oram2=$quantVanilla*$_SESSION['Vanilla Sweet Milk Tea'];
-        array_push($_SESSION['orderamount'], $oram2);
+        // Check if the query executed successfully
+        if (!$stmt->execute()) {
+            echo '<script>alert("Error placing order. Please try again.");</script>';
+            $stmt->close();
+            return; // Return if there's an error inserting an order item
+        }
     }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		$oram2=($quantVanilla*$_SESSION['Vanilla Sweet Milk Tea'])+20;
-        array_push($_SESSION['orderamount'], $oram2);
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oram2=($quantVanilla*$_SESSION['Vanilla Sweet Milk Tea'])+50;
-        array_push($_SESSION['orderamount'], $oram2);
-    }
-	   
-	  
-	
-	array_push($_SESSION['orderqty'], $quantVanilla);
-	
 
-	array_push($_SESSION['orderitems'], "Vanilla Sweet Milk Tea {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-  
-  if (isset($_POST['atclemon'])){
-	   $quantLemon=$_POST['quantLemon'];
-	  
-	  if ($_POST['size'] == 'REGULAR') {
-		  $oram3=$quantLemon*$_SESSION['Lemon Iced Tea'];
-		  array_push($_SESSION['orderamount'], $oram3);
-        
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		$oram3=($quantLemon*$_SESSION['Lemon Iced Tea'])+20;
-		array_push($_SESSION['orderamount'], $oram3);
-        
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oram3=($quantLemon*$_SESSION['Lemon Iced Tea'])+50;
-		array_push($_SESSION['orderamount'], $oram3);
-        
-    }
-	  
-	    
-	
-	array_push($_SESSION['orderqty'], $quantLemon);
-	
+    // Clear session data after successful order placement
+    $_SESSION['orderqty'] = [];
+    $_SESSION['orderamount'] = [];
+    $_SESSION['orderitems'] = [];
 
-	array_push($_SESSION['orderitems'], "Lemon Iced Tea {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-  if (isset($_POST['atcorange'])){
-	  $quantOrange=$_POST['quantOrange'];
-	  
-	  if ($_POST['size'] == 'REGULAR') {
-		  $oram4=$quantOrange*$_SESSION['Orange Iced Tea'];
-		  array_push($_SESSION['orderamount'], $oram4);
-        
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		$oram4=($quantOrange*$_SESSION['Orange Iced Tea'])+20;
-		array_push($_SESSION['orderamount'], $oram4);
-        
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oram4=($quantOrange*$_SESSION['Orange Iced Tea'])+50;
-		
-		array_push($_SESSION['orderamount'], $oram4);
-        
-    }
-	  
-	   
-	
-	array_push($_SESSION['orderqty'], $quantOrange);
-	
-
-	array_push($_SESSION['orderitems'], "Orange Iced Tea {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-  if (isset($_POST['atcpineapple'])){
-	   $quantPineapple=$_POST['quantPineapple'];
-	  
-	  if ($_POST['size'] == 'REGULAR') {
-        $oram5=$quantPineapple*$_SESSION['Pineapple Iced Tea'];
-		array_push($_SESSION['orderamount'], $oram5);
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		 $oram5=($quantPineapple*$_SESSION['Pineapple Iced Tea'])+20;
-        array_push($_SESSION['orderamount'], $oram5);
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oram5=($quantPineapple*$_SESSION['Pineapple Iced Tea'])+50;
-        array_push($_SESSION['orderamount'], $oram5);
-    }
-	  
-	
-	array_push($_SESSION['orderqty'], $quantPineapple);
-	
-
-	array_push($_SESSION['orderitems'], "Pineapple Iced Tea {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-   if (isset($_POST['atciced'])){
-	    $quantIced=$_POST['quantIced'];
-	   if ($_POST['size'] == 'REGULAR') {
-        $oram6=$quantIced*$_SESSION['Iced Chickolet Frappe'];
-		array_push($_SESSION['orderamount'], $oram6);
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		 $oram6=($quantIced*$_SESSION['Iced Chickolet Frappe'])+20;
-        array_push($_SESSION['orderamount'], $oram6);
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oram6=($quantIced*$_SESSION['Iced Chickolet Frappe'])+50;
-        array_push($_SESSION['orderamount'], $oram6);
-    }
-	   
-	    
-	
-	array_push($_SESSION['orderqty'], $quantIced);
-
-	array_push($_SESSION['orderitems'], "Iced Chickolet Frappe {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-  
-
-  
-  if (isset($_POST['atcjava'])){
-	  $quantJava=$_POST['quantJava'];
-	  
-	  if ($_POST['size'] == 'REGULAR') {
-		   $oramjava=$quantJava* $_SESSION['JavaChipsie Frappe'];
-		   array_push($_SESSION['orderamount'], $oramjava);
-        
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		$oramjava=($quantJava* $_SESSION['JavaChipsie Frappe'])+20;
-         array_push($_SESSION['orderamount'], $oramjava);
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		$oramjava=($quantJava* $_SESSION['JavaChipsie Frappe'])+50;
-         array_push($_SESSION['orderamount'], $oramjava);
-    }
-array_push($_SESSION['orderqty'], $quantJava);
-	array_push($_SESSION['orderitems'], "JavaChipsie Frappe {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
- 
-  
-  if (isset($_POST['atctriple'])){
-	   $quantTriple=$_POST['quantTriple'];
-	  if ($_POST['size'] == 'REGULAR') {
-        $oram7=$quantTriple*$_SESSION['Triple Mocha Frappe'];
-		array_push($_SESSION['orderamount'], $oram7);
-    }
-	
-	elseif ($_POST['size'] == 'MEDIUM') {
-		 $oram7=($quantTriple*$_SESSION['Triple Mocha Frappe'])+20;
-        array_push($_SESSION['orderamount'], $oram7);
-    }
-	
-	elseif ($_POST['size'] == 'LARGE') {
-		 $oram7=($quantTriple*$_SESSION['Triple Mocha Frappe'])+50;
-        array_push($_SESSION['orderamount'], $oram7);
-    }
-	  
-	   
-	
-	array_push($_SESSION['orderqty'], $quantTriple);
-
-	array_push($_SESSION['orderitems'], "Triple Mocha Frappe {$_POST['size']}");
-	  
-	  echo '<script>alert("Item added to the cart.");</script>';
-  }
-  
-  if (isset($_POST['checkout'])){
-	  $totalamount= 0+array_sum($_SESSION['orderamount']);
-	  $combinedArray = array();
-	  
-	
-	 
-foreach ($_SESSION['orderitems'] as $index => $item) {
-    $quantity = $_SESSION['orderqty'][$index];
-    $combinedArray[] = $item . ' ' . $quantity;
+    // Show success message and redirect to the user page
+    echo '<script>alert("Order placed successfully!");</script>';
+    header('Location: ../usermain.php'); // Redirect to user page after checkout
+    exit(); // Ensure the script stops execution after redirection
 }
 
 
-$combinedArray[] = 'Total Price: ' . $totalamount;
-
-	 $cartItemsString = implode(', ', $combinedArray);
-	 
-	  $selectedPaymentMethod = $_POST['payment_method'];
-	  
-	  if ($selectedPaymentMethod == 'E-WALLET') {
-		  $sqltopup = "SELECT Wallet FROM users WHERE email = '{$_SESSION['email']}'";
-$resultop = $sqlLink->query($sqltopup);
-$topup = $resultop->fetch_assoc();
-		  $paywallet = $topup['Wallet'] - $totalamount;
-		  if ($paywallet >= 0){
-	
-		  $updateQuery1 = "UPDATE users SET Wallet = ? WHERE email = ?";
-    $stmt2 = $sqlLink->prepare($updateQuery1);
-    $stmt2->bind_param("ss", $paywallet, $email);
-    $stmt2->execute();
-    $stmt2->close();
-	
-	echo '<script>alert("Checkout Successful");</script>';
-	 $_SESSION['orderqty'] = [];
+// Clear cart
+if (isset($_POST['clrcart'])) {
+    $_SESSION['orderqty'] = [];
     $_SESSION['orderamount'] = [];
     $_SESSION['orderitems'] = [];
-	header('location: ../usermain.php');
-			  
-		  }
-		  else {
-    // Insufficient funds, display alert and cancel the transaction
-    echo '<script>alert("Insufficient funds. Transaction canceled.");</script>';
-    header('location: ../usermain.php'); // Redirect or handle accordingly
-}
-		  
-		 
-        
-    }
-	
-	else{
-		
-		  $updateQuery = "UPDATE users SET pending_items = ? WHERE email = ?";
-    $stmt1 = $sqlLink->prepare($updateQuery);
-    $stmt1->bind_param("ss", $cartItemsString, $email);
-    $stmt1->execute();
-    $stmt1->close();
-	
-	
-	echo '<script>alert("Checkout Successful");</script>';
-	 $_SESSION['orderqty'] = [];
-    $_SESSION['orderamount'] = [];
-    $_SESSION['orderitems'] = [];
-	header('location: ../usermain.php');
-		
-	}
-	  
-	
-  }
-  
-  
-  if (isset($_POST['clrcart'])){
-	  $_SESSION['orderqty'] = [];
-    $_SESSION['orderamount'] = [];
-    $_SESSION['orderitems'] = [];
-
-   
     header("Location: cart.php");
-  }
+}
 ?>
-

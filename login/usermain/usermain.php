@@ -1,57 +1,67 @@
 <?php
 session_start();
 include "connection.php";
-$conn = mysqli_connect('localhost', 'root','' , 'thirstea');
+$conn = mysqli_connect('localhost', 'root', '', 'thirstea');
 
 $itemPrices = array();
-
 $itemSpecials = array();
 $itemSpecialsDes = array();
 
-$query = "SELECT product_name, price, product_description FROM product ";
+$query = "SELECT product_name, price, product_description FROM product";
 $result = $conn->query($query);
 $counter = 0;
 
 if ($result->num_rows > 0) {
-   
     while ($row = $result->fetch_assoc()) {
-		$counter++; 
-		if ($counter <= 9) {
-           
+        $counter++;
+        if ($counter <= 9) {
             $itemPrices[$row['product_name']] = $row['price'];
-        } 
-		
-		else {
-            
+        } else {
             $itemSpecials[] = $row['product_name'];
-			$itemSpecialsDes[$row['product_name']] = $row['product_description'];
-			 $itemPrices[$row['product_name']] = $row['price'];
+            $itemSpecialsDes[$row['product_name']] = $row['product_description'];
+            $itemPrices[$row['product_name']] = $row['price'];
         }
-        
     }
 }
 
-$_SESSION['Salted Caramel Tea']=$itemPrices['salted_caramel_tea'];
-$_SESSION['Matcha Latte Milk Tea']=$itemPrices['matcha_latte_milk_tea'];
-$_SESSION['Vanilla Sweet Milk Tea']=$itemPrices['vanilla_sweet_milk_tea'];
-$_SESSION['Lemon Iced Tea']=$itemPrices['lemon_iced_tea'];
-$_SESSION['Orange Iced Tea']=$itemPrices['orange_iced_tea'];
-$_SESSION['Pineapple Iced Tea']=$itemPrices['pineapple_iced_tea'];
-$_SESSION['Iced Chickolet Frappe']=$itemPrices['iced_chickolet_frappe'];
-$_SESSION['JavaChipsie Frappe']=$itemPrices['javachipsie_frappe'];
-$_SESSION['Triple Mocha Frappe']=$itemPrices['mocha_frappe'];
+$_SESSION['Salted Caramel Tea'] = $itemPrices['salted_caramel_tea'];
+$_SESSION['Matcha Latte Milk Tea'] = $itemPrices['matcha_latte_milk_tea'];
+$_SESSION['Vanilla Sweet Milk Tea'] = $itemPrices['vanilla_sweet_milk_tea'];
+$_SESSION['Lemon Iced Tea'] = $itemPrices['lemon_iced_tea'];
+$_SESSION['Orange Iced Tea'] = $itemPrices['orange_iced_tea'];
+$_SESSION['Pineapple Iced Tea'] = $itemPrices['pineapple_iced_tea'];
+$_SESSION['Iced Chickolet Frappe'] = $itemPrices['iced_chickolet_frappe'];
+$_SESSION['JavaChipsie Frappe'] = $itemPrices['javachipsie_frappe'];
+$_SESSION['Triple Mocha Frappe'] = $itemPrices['mocha_frappe'];
 
+// Check if user is logged in and fetch user details
+if (isset($_SESSION['email'])) {
+    $email = $_SESSION['email'];
+    $query = "SELECT id, name, email FROM users WHERE email = '$email'"; // Ensure 'id' is also selected
+    $result = $conn->query($query);
 
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $id = $user['id'];  // Correctly fetch the 'id' from the result
+        $fullName = $user['name'];  // User's full name
+        $userEmail = $user['email'];  // User's email
+    } else {
+        // Handle the case if no user found
+        echo "User not found.";
+    }
+} else {
+    echo "User not logged in.";
+}
 include "add_to_cart.php";
 
- if (isset($_GET['logout'])) {
-  	session_destroy();
-  	unset($_SESSION['email']);
-	echo '<script>alert("Logout Successful");</script>';
-  	header("location: ../../index.html");
-  }
- 
+if (isset($_GET['logout'])) {
+    session_destroy();
+    unset($_SESSION['email']);
+    echo '<script>alert("Logout Successful");</script>';
+    header("location: ../../index.html");
+}
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -207,14 +217,14 @@ include "add_to_cart.php";
                         type="button" role="tab" aria-controls="pills-fries" aria-selected="true"><h3>Frappe</h3></button>
                 </li>
 				<?php
-				$specials="SELECT id, product_name FROM product";
+				$specials="SELECT product_id, product_name FROM product";
 				$specialstab = $conn->query($specials);
 				
 				if ($specialstab->num_rows > 0) {
     
     while ($row = $specialstab->fetch_assoc()) {
         
-        if ($row['id'] > 9) {
+        if ($row['product_id'] > 9) {
             echo '<li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-fries-tab" data-bs-toggle="pill" data-bs-target="#pills-special"
                         type="button" role="tab" aria-controls="pills-fries" aria-selected="true"><h3>Special</h3></button>
