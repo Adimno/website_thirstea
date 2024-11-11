@@ -21,17 +21,21 @@ $cloudinary = new Cloudinary([
     ]
 ]);
 
+$product = null; // Initialize $product as null to avoid undefined variable warnings
+
 // Check if the product ID is passed in the URL
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     // Fetch the product data from the database
-    $query = mysqli_query($con, "SELECT * FROM product WHERE id = $id");
-    $product = mysqli_fetch_array($query);
+    $query = mysqli_query($con, "SELECT * FROM product WHERE product_id = $id"); // Use product_id instead of id
+    if ($query && mysqli_num_rows($query) > 0) {
+        $product = mysqli_fetch_array($query); // Initialize the $product variable with fetched data
+    }
 }
 
 // Handle the form submission for updating the product
-if (isset($_POST['edit_product'])) {
+if (isset($_POST['edit_product']) && $product !== null) { // Ensure $product is not null
     $name = mysqli_real_escape_string($con, $_POST['product_name']);
     $category = mysqli_real_escape_string($con, $_POST['category']);
     $description = mysqli_real_escape_string($con, $_POST['product_description']);
@@ -56,7 +60,7 @@ if (isset($_POST['edit_product'])) {
     }
 
     // Update the product in the database
-    $updateQuery = "UPDATE product SET product_name = '$name', category = '$category', product_description = '$description', price = $price, availability = $availability, imageUrl = '$imageUrl' WHERE id = $id";
+    $updateQuery = "UPDATE product SET product_name = '$name', category = '$category', product_description = '$description', price = $price, availability = $availability, imageUrl = '$imageUrl' WHERE product_id = $id";
     if (mysqli_query($con, $updateQuery)) {
         header('Location: adminmain.php');
         exit;
@@ -64,6 +68,7 @@ if (isset($_POST['edit_product'])) {
         echo "Error: " . mysqli_error($con);
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -86,6 +91,7 @@ if (isset($_POST['edit_product'])) {
                     <h3>Edit Product</h3>
                 </div>
                 <div class="card-body">
+                    <?php if ($product !== null): ?> <!-- Only show the form if product is found -->
                     <form method="POST" action="" enctype="multipart/form-data">
                         <fieldset>
                             <legend>Product Details</legend>
@@ -139,6 +145,9 @@ if (isset($_POST['edit_product'])) {
                             </div>
                         </fieldset>
                     </form>
+                    <?php else: ?>
+                        <p class="text-danger">Product not found.</p>
+                    <?php endif; ?>
 
                     <!-- Back Button -->
                     <div class="form-group text-center">

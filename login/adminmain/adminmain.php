@@ -120,7 +120,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Id</th>
+
                     <th>Image</th>
                     <th>Product Name</th>
                     <th>Category</th>
@@ -137,8 +137,6 @@
                 
                 $query1 = $sqlLink->query("SELECT * FROM product ORDER by product_id");
                 while ($row1 = $query1->fetch_array()) {
-                    echo "<tr>";
-                    echo "<td>" . $row1['product_id'] . "</td>";
                     echo "<td><img src='" . $row1['imageUrl'] . "' width='50' height='50'></td>";
                     echo "<td>" . $row1['product_name'] . "</td>";
                     echo "<td>" . $row1['category'] . "</td>";
@@ -167,27 +165,27 @@
                 if (isset($_POST['new_priceEdit'])) {
                     $id = $_POST['product_id'];
                     $new_price = $_POST['new_price'];
-                    $sqlUpdate = "UPDATE product SET price = $new_price WHERE id = '$id'";
+                    $sqlUpdate = "UPDATE product SET price = $new_price WHERE product_id = '$id'";
                     mysqli_query($sqlLink, $sqlUpdate);
                 }
 
                 // Handling product availability
                 if (isset($_GET['id1'])) {
                     $id = $_GET['id1'];
-                    $sqlUpdate = "UPDATE product SET availability = 0 WHERE id = '$id'";
+                    $sqlUpdate = "UPDATE product SET availability = 0 WHERE product_id = '$id'";
                     mysqli_query($sqlLink, $sqlUpdate);
                 }
 
                 if (isset($_GET['id2'])) {
                     $id = $_GET['id2'];
-                    $sqlUpdate = "UPDATE product SET availability = 1 WHERE id = '$id'";
+                    $sqlUpdate = "UPDATE product SET availability = 1 WHERE product_id = '$id'";
                     mysqli_query($sqlLink, $sqlUpdate);
                 }
 
                 // Deleting a product
                 if (isset($_GET['delete_id'])) {
                     $id = $_GET['delete_id'];
-                    $sqlDelete = "DELETE FROM product WHERE id='$id'";
+                    $sqlDelete = "DELETE FROM product WHERE product_id='$id'";
                     mysqli_query($sqlLink, $sqlDelete);
                 }
 
