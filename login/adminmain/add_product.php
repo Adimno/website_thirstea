@@ -71,6 +71,40 @@ mysqli_close($conn);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+          body {
+            background-color: #2c2f38; /* Dark background */
+            color: white; /* Light text */
+        }
+        .card {
+            background-color: #1e1e1e;
+            border: none;
+        }
+        .card-header {
+            background-color: #333;
+            color: white;
+        }
+        .form-control, .form-check-label, .btn {
+            background-color: #333;
+            color: white;
+            border: 1px solid #444;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .form-group label {
+            color: #ccc;
+        }
+    </style>
 </head>
 <body>
 
@@ -92,20 +126,17 @@ mysqli_close($conn);
                                 <input id="product_name" name="product_name" placeholder="Product Name" class="form-control" required type="text">
                             </div>
 
-                            
                             <!-- Category -->
                             <div class="form-group">
-                                   <label for="category">Category</label>
-                                       <select id="category" name="category" class="form-control" required>
-                                          <option value="">Select Category</option>
-                                        <option value="Milktea">Milktea</option>
-                                       <option value="Fruitea">Fruitea</option>
-                                       <option value="Frappe">Frappe</option>
-                                    </select>
-                                  </div>
+                                <label for="category">Category</label>
+                                <select id="category" name="category" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Milktea">Milktea</option>
+                                    <option value="Fruitea">Fruitea</option>
+                                    <option value="Frappe">Frappe</option>
+                                </select>
+                            </div>
 
-
-                                  
                             <!-- Product Description -->
                             <div class="form-group">
                                 <label for="product_description">Product Description</label>
@@ -117,7 +148,6 @@ mysqli_close($conn);
                                 <label for="price">Price</label>
                                 <input id="price" name="price" placeholder="Price" class="form-control" required type="number">
                             </div>
-
 
                             <!-- Image Upload -->
                             <div class="form-group">
