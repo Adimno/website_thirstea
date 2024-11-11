@@ -13,9 +13,6 @@ $sqladd = "SELECT address FROM users WHERE email = '$email'";
 $result2 = $conn->query($sqladd);
 $addressU = $result2->fetch_assoc();
 
-$sqltop = "SELECT Wallet FROM users WHERE email = '$email'";
-$result3 = $conn->query($sqltop);
-$topup = $result3->fetch_assoc();
 
 ?>
 
@@ -105,71 +102,7 @@ $topup = $result3->fetch_assoc();
             </div>
           </div>
         </div>
-		<?php
-		$conn = mysqli_connect('localhost', 'root','' , 'thirstea');
-   
-   
-            $query = "SELECT credit_card FROM users WHERE email = '$email'";
-			
-			$result = $conn->query($query);
-			
-			 if ($result && $row = $result->fetch_assoc()) {
-                $creditCard = $row['credit_card'];
 
-                
-                if (!empty($creditCard)) {
-                   echo'<div class="col-lg-8">
-        <div class="card mb-4">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-sm-3">
-			  
-                <p class="mb-0">WALLET AMOUNT:</p>
-              </div>
-              <div class="col-sm-9">
-			 
-			  
-                <p class="text-muted mb-0">'. $topup['Wallet'] .'</p>
-				
-				
-              </div>
-            </div>
-            <hr>
-            <div class="row">
-              <div class="col-sm-3">
-                <p class="mb-0">TOPUP AMOUNT:</p>
-              </div>
-              <div class="col-sm-9">
-			  
-			  <form action="update_profile.php" method="post">
-                <p class="text-muted mb-0"><input type="number" name="topqty" min="0" oninput="validity.valid||(value=\'\');"></p>
-				
-				
-              </div>
-            </div>
-            <hr>
-            
-            
-            
-            
-            
-			
-			<hr>
-			 <div class="d-flex justify-content-center mb-2">
-			 
-             <button class="btn btn-primary" type="submit" name="TopButton">TOP UP</button>
-			 </form>
-
-              
-            </div>
-          </div>
-        </div>';
-		
-                }
-            }
-			
-		
-		?>
 		
 		
 		

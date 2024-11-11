@@ -73,26 +73,36 @@ function calculateOrderAmount($quantity, $price, $size) {
 
 
 
-// Checkout process
-if (isset($_POST['checkout'])) {
+if (isset($_POST['checkout1'])) {
     $totalAmount = array_sum($_SESSION['orderamount'] ?? []);
     
     // Get the selected payment method
     $selectedPaymentMethod = $_POST['payment_method'] ?? 'COD';  // Default to 'COD' if nothing is selected
-
+    
+    // Get the current date for order date
+    $orderDate = date('Y-m-d H:i:s');
+    
     // Insert each order item separately
     foreach ($_SESSION['orderitems'] as $index => $item) {
         $productName = $item; // Product name with size
         $quantity = $_SESSION['orderqty'][$index]; // Quantity
         $orderAmount = $_SESSION['orderamount'][$index]; // Total amount for the product
+        $size = $_SESSION['ordersize'][$index]; // Size
+        $imageUrl = $_SESSION['orderimage'][$index]; // Product image URL
+        
+        // Assume 'pending_order' is the default status when an order is placed
+        $orderStatus = 'Pending';
+
+        // Generate a unique order ID
+        $orderId = uniqid('order_', true);
 
         // Insert the order item into the database
-        $query = "INSERT INTO orders (user_email, order_items, order_quantity, order_amount, payment_method) 
-                  VALUES (?, ?, ?, ?, ?)";
+        $query = "INSERT INTO orders (order_id, user_email, imageUrl, product_name, size, order_quantity, pending_order, payment_method, order_amount, order_status, order_date) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $sqlLink->prepare($query);
 
         // Ensure parameters are passed correctly with the correct types
-        $stmt->bind_param("ssdss", $email, $productName, $quantity, $orderAmount, $selectedPaymentMethod);
+        $stmt->bind_param("ssssdsdssss", $orderId, $email, $imageUrl, $productName, $size, $quantity, $orderAmount, $selectedPaymentMethod, $orderStatus, $orderDate);
 
         // Check if the query executed successfully
         if (!$stmt->execute()) {
@@ -106,6 +116,8 @@ if (isset($_POST['checkout'])) {
     $_SESSION['orderqty'] = [];
     $_SESSION['orderamount'] = [];
     $_SESSION['orderitems'] = [];
+    $_SESSION['ordersize'] = [];
+    $_SESSION['orderimage'] = [];
 
     // Show success message and redirect to the user page
     echo '<script>alert("Order placed successfully!");</script>';

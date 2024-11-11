@@ -31,6 +31,12 @@ a {
 	text-decoration: none;
 }
 
+.cart-item-image {
+    max-width: 100%;   /* Ensure the image doesn't overflow its container */
+    height: auto;      /* Maintain aspect ratio */
+    max-height: 400px; /* Set a maximum height */
+}
+
 a:hover {
 	color: var(--dark-blue);
 }

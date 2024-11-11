@@ -66,10 +66,6 @@
                                 <input class="form-control" pattern=".{8,}"  name="EditConPassword" type="password" placeholder="Confirm your password"  required>
                             </div>
                         </div>
-						 <div class="mb-3">
-                            <label class="small mb-1" for="creditCard">VISA/CREDIT CARD</label>
-                            <input class="form-control"  type="text" id="creditCard" name="creditCard" placeholder="Enter your VISA/CREDIT CARD" >
-                        </div>
                         <!-- Save changes button-->
                         <button class="btn btn-primary" type="submit" name="SaveChanges">Save changes</button>
                     </form>
