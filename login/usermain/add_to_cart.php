@@ -1,22 +1,22 @@
 <?php
-session_start();
 
-$email = $_SESSION['email'];
-$specialArray = $_SESSION['Specials'] ?? [];
 
+session_start();  // Start the session at the top of the page to maintain session state
+
+// Check if the user is logged in
+if (!isset($_SESSION['email'])) {
+    // If the user is not logged in, redirect to the login page
+    echo '<script>alert("Please log in to view the cart."); window.location.href="../user.php";</script>';
+    exit();
+}
+
+// Now you can safely access $_SESSION['email'] and other session variables
+$email = $_SESSION['email'];  // User email from the session
+$cartItems = $_SESSION['orderitems'] ?? [];  // Cart items from the session, or an empty array if no items exist
+
+// Your database connection
 $sqlLink = mysqli_connect('localhost', 'root', '', 'thirstea');
 
-// If email is not found in session, it means the user is not logged in
-if (!$email) {
-    echo '<script>alert("Please log in to add items to the cart."); window.location.href="login.php";</script>';
-    exit();
-}
-
-// If email is not found in session, it means the user is not logged in
-if (!$email) {
-    echo '<script>alert("Please log in to add items to the cart."); window.location.href="login.php";</script>';
-    exit();
-}
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
     // Get the product details from the form
     $productId = (int)$_POST['product_id'];

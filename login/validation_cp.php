@@ -37,7 +37,6 @@ if ($num == 1) {
         $_SESSION['role'] = 'user'; // Store the user role in session for website navigation
         echo json_encode(array('status' => 'success', 'message' => 'Login successful', 'role' => 'user'));
         // Redirect to user page
-        header('Location: usermain/usermain.php');
         exit(); // Make sure to stop the script after the redirect
     }
 } else {
