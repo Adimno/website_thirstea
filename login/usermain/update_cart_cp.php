@@ -37,22 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Existing code for updating cart
         $cart_item_id = $_POST['cart_id'];
         $order_quantity = $_POST['order_quantity'];
+        $order_amount = $_POST['order_amount']; // Get the order amount from the POST data
 
         // Validate inputs
-        if (empty($cart_item_id) || empty($order_quantity)) {
+        if (empty($cart_item_id) || empty($order_quantity) || empty($order_amount)) {
             echo json_encode(['success' => false, 'message' => 'Missing parameters']);
             exit();
         }
 
-        // Update the quantity in the database
-        $query = "UPDATE user_cart SET order_quantity = ? WHERE cart_id = ?";
+        // Update the quantity and order amount in the database
+        $query = "UPDATE user_cart SET order_amount = ?, order_quantity = ? WHERE cart_id = ?";
         $stmt = $sqlLink->prepare($query);
-        $stmt->bind_param("ii", $order_quantity, $cart_item_id);
+        $stmt->bind_param("dii", $order_amount, $order_quantity, $cart_item_id); // Bind the order amount as a double and quantity as an integer
 
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Quantity updated successfully']);
+            echo json_encode(['success' => true, 'message' => 'Quantity and order amount updated successfully']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to update quantity']);
+            echo json_encode(['success' => false, 'message' => 'Failed to update quantity or order amount']);
         }
         $stmt->close();
     }
