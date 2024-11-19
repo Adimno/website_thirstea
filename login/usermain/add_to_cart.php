@@ -60,10 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
 function calculateOrderAmount($quantity, $price, $size) {
     $extraCharge = 0;
     switch ($size) {
-        case 'MEDIUM':
+        case 'Medium':
             $extraCharge = 10; // Extra charge for medium size
             break;
-        case 'LARGE':
+        case 'Large':
             $extraCharge = 20; // Extra charge for large size
             break;
     }

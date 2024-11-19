@@ -239,9 +239,9 @@ if (isset($_GET['logout'])) {
                                             <input type="hidden" name="imageUrl" value="' . $imageUrl . '">
                                             <input type="hidden" name="description" value="' . $description . '">
                                             <select name="size" required>
-                                                <option value="REGULAR">REGULAR</option>
-                                                <option value="MEDIUM">MEDIUM</option>
-                                                <option value="LARGE">LARGE</option>
+                                                <option value="Small">SMALL</option>
+                                                <option value="Medium">MEDIUM</option>
+                                                <option value="Large">LARGE</option>
                                             </select>
                                             <hr>
                                             <input type="number" name="order_quantity" class="form-control input-number" required="required" min="1" value="1">
@@ -299,9 +299,9 @@ if (isset($_GET['logout'])) {
                                             <input type="hidden" name="imageUrl" value="' . $imageUrl . '">
                                             <input type="hidden" name="description" value="' . $description . '">
                                             <select name="size" required>
-                                                <option value="REGULAR">REGULAR</option>
-                                                <option value="MEDIUM">MEDIUM</option>
-                                                <option value="LARGE">LARGE</option>
+                                                <option value="Small">SMALL</option>
+                                                <option value="Medium">MEDIUM</option>
+                                                <option value="Large">LARGE</option>
                                             </select>
                                             <hr>
                                             <input type="number" name="order_quantity" class="form-control input-number" required="required" min="1" value="1">
@@ -359,9 +359,9 @@ if (isset($_GET['logout'])) {
                                             <input type="hidden" name="imageUrl" value="' . $imageUrl . '">
                                             <input type="hidden" name="description" value="' . $description . '">
                                             <select name="size" required>
-                                                <option value="REGULAR">REGULAR</option>
-                                                <option value="MEDIUM">MEDIUM</option>
-                                                <option value="LARGE">LARGE</option>
+                                                <option value="Small">SMALL</option>
+                                                <option value="Medium">MEDIUM</option>
+                                                <option value="Large">LARGE</option>
                                             </select>
                                             <hr>
                                             <input type="number" name="order_quantity" class="form-control input-number" required="required" min="1" value="1">
