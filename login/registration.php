@@ -10,6 +10,8 @@ $address = $_POST['address'];
 $password = $_POST['password'];
 $name = $_POST['name'];
 
+$role = 'User';
+
 $s = " SELECT * FROM `users` where email = '$email'";
 $result = mysqli_query($con, $s);
 $num = mysqli_num_rows($result);
@@ -17,7 +19,7 @@ if ($num == 1){
 	echo '<script>alert("Email already in use")</script>';
 }
 else{
-	$reg = " INSERT INTO `users` (`id`, `name` , `email`, `password`, `admin`, `address`) VALUES (NULL,'$name', '$email', '$password', 0, '$address');";
+	$reg = " INSERT INTO `users` (`id`, `name` , `email`, `password`, `role`, `address`) VALUES (NULL,'$name', '$email', '$password', '$role', '$address');";
 	mysqli_query($con, $reg);
 	echo '<script>alert("Registration Succesful")</script>';
 	?>

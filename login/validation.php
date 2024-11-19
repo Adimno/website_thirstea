@@ -25,21 +25,23 @@ if ($num == 1) {
     $_SESSION['email'] = $email; // Store email in session
 
     // Check user role (admin, cp_user, or regular user)
-    if ($row['admin'] == 1) {
-        // If the user is an admin
-        $_SESSION['role'] = 'admin'; // Store the user role in session for website navigation
-        echo json_encode(array('status' => 'success', 'message' => 'Login successful', 'role' => 'admin'));
-        // Redirect to admin page
-        header('Location: adminmain/adminmain.php');
-        exit(); // Make sure to stop the script after the redirect
-    }  else {
-        // If the user is a regular user
-        $_SESSION['role'] = 'user'; // Store the user role in session for website navigation
-        echo json_encode(array('status' => 'success', 'message' => 'Login successful', 'role' => 'user'));
-        // Redirect to user page
-        header('Location: usermain/usermain.php');
-        exit(); // Make sure to stop the script after the redirect
-    }
+ // Check user role (Admin or User)
+if ($row['role'] == 'Admin') {
+    // If the user is an admin
+    $_SESSION['role'] = 'Admin'; // Store the user role in session for website navigation
+    echo json_encode(array('status' => 'success', 'message' => 'Login successful', 'role' => 'Admin'));
+    // Redirect to admin page
+    header('Location: adminmain/adminmain.php');
+    exit(); // Make sure to stop the script after the redirect
+} else {
+    // If the user is a regular user
+    $_SESSION['role'] = 'User'; // Store the user role in session for website navigation
+    echo json_encode(array('status' => 'success', 'message' => 'Login successful', 'role' => 'User'));
+    // Redirect to user page
+    header('Location: usermain/usermain.php');
+    exit(); // Make sure to stop the script after the redirect
+}
+
 } else {
     // If credentials are invalid, respond with an error message
     echo json_encode(array('status' => 'error', 'message' => 'Invalid email or password'));

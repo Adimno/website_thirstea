@@ -18,7 +18,7 @@ $password = $_POST['password'];
 
 // Role can be set based on conditions, for now we assign default 'user' role
 // You can modify this logic to assign roles like 'cp' or 'admin' based on your criteria.
-$role = 'user'; // Default role is 'user'
+$role = 'User'; // Default role is 'user'
 
 // Check if email already exists
 $s = "SELECT * FROM `users` WHERE email = '$email'";
