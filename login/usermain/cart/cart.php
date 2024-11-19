@@ -21,73 +21,6 @@ while ($row = $result->fetch_assoc()) {
 }
 
 
-if (isset($_POST['checkout'])) {
-    // Get the selected payment method
-    $selectedPaymentMethod = $_POST['payment_method'] ?? 'COD';  // Default to 'COD' if nothing is selected
-
-    // Get the current date for order date
-    $orderDate = date('Y-m-d H:i:s');
-
-    // Assuming user email is stored in session upon login
-    $email = $_SESSION['email'];
-
-    // Process each cart item and insert into orders table
-    foreach ($cartItems as $item) {
-        $productName = $item['description']; // Product description (could be the name of the product)
-        $quantity = $item['order_quantity']; // Quantity from cart
-        $orderAmount = $item['order_amount']; // Total price for this product
-        $size = $item['size']; // Size of the product
-        $imageUrl = $item['imageUrl']; // Image URL for the product
-
-        // Default order status as 'Pending'
-        $orderStatus = 'Pending';
-
-        // Generate a unique order ID
-        $orderId = uniqid('order_', true);
-
-        // Insert the order item into the database
-        $query = "INSERT INTO orders (order_id, user_email, imageUrl, product_name, size, order_quantity, payment_method, order_amount, order_status, order_date)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        // Prepare the query
-        $stmt = $sqlLink->prepare($query);
-
-        // Bind the parameters
-        // Corrected parameter types: s = string, i = integer, d = double
-        $stmt->bind_param("ssssssssss", 
-            $orderId, 
-            $email, 
-            $imageUrl, 
-            $productName, 
-            $size, 
-            $quantity, 
-            $selectedPaymentMethod, 
-            $orderAmount, 
-            $orderStatus, 
-            $orderDate
-        );
-
-        // Check if the query executed successfully
-        if (!$stmt->execute()) {
-            echo '<script>alert("Error placing order. Please try again.");</script>';
-            $stmt->close();
-            return; // Return if there's an error inserting an order item
-        }
-    }
-
-    // Clear cart items after successful order placement
-    $clearCartQuery = "DELETE FROM user_cart WHERE user_email = ?";
-    $clearCartStmt = $sqlLink->prepare($clearCartQuery);
-    $clearCartStmt->bind_param("s", $email);
-    $clearCartStmt->execute();
-
-    // Show success message and redirect to the user page
-    echo '<script>alert("Order placed successfully!");</script>';
-    header('Location: ../usermain.php'); // Redirect to user page after checkout
-    exit(); // Ensure the script stops execution after redirection
-}
-
-
 
 ?>
 
@@ -153,13 +86,6 @@ if (isset($_POST['checkout'])) {
         <!-- Payment method dropdown -->
         <div class="row" style="padding: 1vh 0;">
         <div class="col">
-            <label for="payment_method">Payment Method</label>
-            <select name="payment_method" id="payment_method" class="form-control">
-                <option value="COD" selected>Cash on Delivery (Free)</option>
-                <!-- <option value="CreditCard">Credit Card</option>
-                <option value="Paypal">PayPal</option> -->
-                <!-- Add other payment methods here -->
-            </select>
         </div>
     </div>
     <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
@@ -172,7 +98,7 @@ if (isset($_POST['checkout'])) {
     <!-- Submit the checkout form -->
     <form action="" method="post">
         <button class="btn" name="clrcart">CLEAR</button>
-        <button class="btn" name="checkout" id="checkoutButton">CHECKOUT</button>
+        <a href="checkout.php" class="btn" id="checkoutButton">CHECKOUT</a>
     </form>
 </div>
 
