@@ -62,7 +62,9 @@ $con->close();
 </head>
 <body>
     <div class="container mt-5">
+
         <h3>Your Orders</h3>
+        <a href="usermain.php" class="btn btn-primary mt-3">Back to Shop</a>
         <hr>
 
         <?php if (count($orders) > 0): ?>
@@ -86,7 +88,7 @@ $con->close();
             <p>You have no orders yet.</p>
         <?php endif; ?>
 
-        <a href="usermain.php" class="btn btn-primary mt-3">Back to Shop</a>
+    
     </div>
 </body>
 </html>
