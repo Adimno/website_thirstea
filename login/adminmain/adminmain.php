@@ -66,46 +66,45 @@ if (isset($_SESSION['order_completed']) && $_SESSION['order_completed'] === true
         <h2 class="mb-4">Account List:</h2>
         <a href="./add_admin.php" class="btn btn-primary mb-3">Add Admin</a>
         <table class="table table-bordered text-white">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Password</th>
-              <th>Address</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-              $sqlLink = mysqli_connect('localhost', 'root', '', 'thirstea');
-              $query = $sqlLink->query("SELECT * FROM users ORDER by id");
-              while($row = $query->fetch_array()){
-                echo "<tr>";
-                echo "<td>" . $row["id"] . "</td>";
-                echo "<td>" . $row["name"] . "</td>";
-                echo "<td>" . $row["email"] . "</td>";
-                echo "<td>" . $row["password"] . "</td>";
-                echo "<td>" . $row["address"] . "</td>";
-                echo "<td><a href='adminmain.php?id=" . $row['id'] . "' class='btn btn-danger'>Delete</a></td>";
-                
-                echo "</tr>";
-              }
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Password</th>
+      <th>Address</th>
+      <th>Role</th>
+      <th>Edit</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+      $sqlLink = mysqli_connect('localhost', 'root', '', 'thirstea');
+      $query = $sqlLink->query("SELECT * FROM users ORDER by id");
+      while($row = $query->fetch_array()){
+        echo "<tr>";
+        echo "<td>" . $row["id"] . "</td>";
+        echo "<td>" . $row["name"] . "</td>";
+        echo "<td>" . $row["email"] . "</td>";
+        echo "<td>" . $row["password"] . "</td>";
+        echo "<td>" . $row["address"] . "</td>";
+        echo "<td>" . $row["role"] . "</td>";
+        echo "<td><a href='edit_user.php?id=" . $row['id'] . "' class='btn btn-warning'>Edit</a></td>"; // Edit button
+        echo "<td><a href='adminmain.php?id=" . $row['id'] . "' class='btn btn-danger'>Delete</a></td>";
+        echo "</tr>";
+      }
 
-              if (isset($_GET['id'])){
-                $id = $_GET['id'];
-                $sqld = "DELETE FROM users WHERE id='$id'";
-                mysqli_query($sqlLink, $sqld);
-              }
-
-              if (isset($_GET['id2'])){
-                $id = $_GET['id2'];
-                $sqld = "UPDATE users SET cart_items = pending_items, pending_items = '' WHERE id='$id'";
-                mysqli_query($sqlLink, $sqld);
-              }
-            ?>
-          </tbody>
-        </table>
+      // Delete functionality
+      if (isset($_GET['id'])){
+        $id = $_GET['id'];
+        $sqld = "DELETE FROM users WHERE id='$id'";
+        mysqli_query($sqlLink, $sqld);
+        header("Location: adminmain.php"); // Redirect to avoid accidental re-deletion
+      }
+    ?>
+  </tbody>
+</table>
       </div>
 
       <!-- Products Section -->

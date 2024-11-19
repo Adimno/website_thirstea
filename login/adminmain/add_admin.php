@@ -86,6 +86,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input id="email" name="email" placeholder="Enter user email" class="form-control" required type="email">
                             </div>
 
+                                     <!-- Address -->
+                           <div class="form-group">
+                              <label for="address">Address</label>
+                              <input id="address" name="address" placeholder="Enter address" class="form-control" required type="text">
+                            </div>
+
                             <!-- Password -->
                             <div class="form-group">
                                 <label for="password">Password</label>
@@ -107,11 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </select>
                             </div>
 
-                            <!-- Address -->
-                            <div class="form-group">
-                                <label for="address">Address</label>
-                                <input id="address" name="address" placeholder="Enter address" class="form-control" required type="text">
-                            </div>
+                   
 
                             <!-- Submit Button -->
                             <div class="form-group text-center">
