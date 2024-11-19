@@ -165,7 +165,6 @@ if (isset($_SESSION['order_completed']) && $_SESSION['order_completed'] === true
         <th>Product Name</th>
         <th>Size</th>
         <th>Quantity</th>
-        <th>Pending Order</th>
         <th>Payment Method</th>
         <th>Order Amount</th>
         <th>Order Date</th>
@@ -184,7 +183,6 @@ if (isset($_SESSION['order_completed']) && $_SESSION['order_completed'] === true
           echo "<td>" . $row2['product_name'] . "</td>";
           echo "<td>" . $row2['size'] . "</td>";
           echo "<td>" . $row2['order_quantity'] . "</td>";
-          echo "<td>" . $row2['pending_order'] . "</td>";
           echo "<td>" . $row2['payment_method'] . "</td>";
           echo "<td> &#8369;" . $row2['order_amount'] . "</td>";
           echo "<td>" . $row2['order_date'] . "</td>";
