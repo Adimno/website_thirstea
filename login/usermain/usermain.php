@@ -75,11 +75,14 @@ if (isset($_GET['logout'])) {
 		<div class="icons">
 			
 			
+        <a class="default" href="./orders.php"><i class="fas fa-box pe-2"></i></a>
+
 			<a class="default" href="./profile.php"><i class="fas fa-circle-user"></i></a>
 			
 			<a class="default" href="cart/cart.php"><i class="fas fa-shopping-cart"></i></a>
 			
 			<a class="default" href="usermain.php?logout='1'"><i class="fas fa-door-open pe-2"></i></a>
+
 		</div>
 	</header>
 	<!-- header section end -->
